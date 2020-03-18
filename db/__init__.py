@@ -1,4 +1,4 @@
-import urlparse
+import urllib.parse
 import logging
 import string
 import os
@@ -47,7 +47,7 @@ class NullDriver(DBError):
 def from_url(url, db_name=None):
     if url is None or url.strip() == "":
         raise InvalidDatabaseURL(url)
-    parsed = urlparse.urlparse(url)
+    parsed = urllib.parse.urlparse(url)
     if parsed.scheme == "":
         raise InvalidDatabaseURL(url)
     try:
@@ -66,7 +66,7 @@ def from_env(var=None, db_name=None):
             var = env_name.upper() + "_" + var_name
         except KeyError:
             var = var_name
-    print "var", var
+    print("var", var)
     url = os.environ[var]
     return from_url(url, db_name=db_name)
 
@@ -147,7 +147,7 @@ class Transaction(object):
 
     @staticmethod
     def _count_name(from_plus):
-        if any(map(lambda c: c not in _TABLE_NAME_CHARS, from_plus)):
+        if any([c not in _TABLE_NAME_CHARS for c in from_plus]):
             left = from_plus.split(" WHERE ", 1)[0]
             normalized_name = left.replace(" ", "_").replace(",", "")
         else:
@@ -166,7 +166,7 @@ def delegate_tx(f):
     @wraps(f)
     def wrapper(self, sql, *args, **kwargs):
         with self.tx(*args, **kwargs) as tx:
-            m = getattr(tx, f.func_name)
+            m = getattr(tx, f.__name__)
             return m(sql, *args, **kwargs)
 
     return wrapper
@@ -176,7 +176,7 @@ def delegate_db(f):
 
     @wraps(f)
     def wrapper(self, *args, **kwargs):
-        m = getattr(self._getdb(), f.func_name)
+        m = getattr(self._getdb(), f.__name__)
         return m(*args, **kwargs)
 
     return wrapper

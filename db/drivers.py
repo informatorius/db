@@ -1,4 +1,4 @@
-import urlparse
+import urllib.parse
 import sys
 import os
 
@@ -32,7 +32,7 @@ def unregister_scheme(scheme):
 
 
 def unregister_class(driver_class):
-    for scheme, e_driver_class in _DRIVERS.iteritems():
+    for scheme, e_driver_class in _DRIVERS.items():
         if e_driver_class == driver_class:
             unregister_scheme(scheme)
 
